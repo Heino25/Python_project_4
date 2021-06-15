@@ -1,8 +1,8 @@
 import pygame, sys, random
 
-pygame.init()
-screen = pygame.display.set_mode((1280,720))
-clock = pygame.time.Clock()
+pygame.init()#initiate pygame
+screen = pygame.display.set_mode((1280,720))#Create display surface
+clock = pygame.time.Clock()#Create clock object
 pygame.mouse.set_visible(False)
 
 wood_bg = pygame.image.load('Wood_BG.png')
@@ -30,9 +30,9 @@ for duck in range(20):
 	duck_rect = duck_surface.get_rect(center = (duck_position_x, duck_position_y))
 	duck_list.append(duck_rect)
 
-while True:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
+while True:#Game loop
+	for event in pygame.event.get():#Check for events/ Player input
+		if event.type == pygame.QUIT:# Close the game
 			pygame.quit()
 			sys.exit()
 		if event.type == pygame.MOUSEMOTION:
@@ -77,5 +77,5 @@ while True:
 	screen.blit(cloud2,(400,50))
 	screen.blit(cloud2,(800,50))
 
-	pygame.display.update()
-	clock.tick(120)
+	pygame.display.update()#Draw frame
+	clock.tick(120)#COntrol the framerate
