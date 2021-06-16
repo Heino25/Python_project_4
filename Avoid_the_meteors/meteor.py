@@ -5,10 +5,13 @@ class SpaceShip(pygame.sprite.Sprite):
 		super().__init__()
 		self.image = pygame.image.load(path)
 		self.rect = self.image.get_rect(center = (x_pos,y_pos))
+		self.shield_surface = pygame.image.load("shield.png")
+		self.health = 5
 
 	def update(self):
 		self.rect.center = pygame.mouse.get_pos()
 		self.screen_constrain()
+		self.display_health()
 
 	def screen_constrain(self):
 		if self.rect.right >= 1280:
@@ -22,6 +25,13 @@ class SpaceShip(pygame.sprite.Sprite):
 
 		if self.rect.bottom >= 720:
 			self.rect.bottom = 720
+
+	def display_health(self):
+		for index,shield in enumerate(range(self.health)):
+			screen.blit(self.shield_surface,(10 + index * 40 ,10))
+
+	def get_damage(self,damage_amount):
+		self.health -= damage_amount
 
 class Meteor(pygame.sprite.Sprite):
 	def __init__(self,path,x_pos,y_pos,x_speed,y_speed):
@@ -38,6 +48,18 @@ class Meteor(pygame.sprite.Sprite):
 		if self.rect.centery >= 800:
 			self.kill()
 
+class Laser(pygame.sprite.Sprite):
+	def __init__(self,path,pos,speed):
+		super().__init__()
+		self.image = pygame.image.load(path)
+		self.rect = self.image.get_rect(center = pos)
+		self.speed = speed
+
+	def update(self):
+		self.rect.centery -= self.speed
+		if self.rect.centery <= -100:
+			self.kill()
+
 pygame.init() #initiate pygame
 screen = pygame.display.set_mode((1280,720)) #Create display surface
 clock = pygame.time.Clock() #Create clock object
@@ -50,11 +72,18 @@ meteor_group = pygame.sprite.Group()
 METEOR_EVENT = pygame.USEREVENT
 pygame.time.set_timer(METEOR_EVENT,250)
 
+laser_group = pygame.sprite.Group()
+
 while True: #Game loop
 	for event in pygame.event.get(): #Check for events/ Player input
 		if event.type == pygame.QUIT:#Close the game
 			pygame.quit()
 			sys.exit()
+
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			new_laser = Laser("Laser.png", event.pos,15)
+			laser_group.add(new_laser)
+
 		if event.type == METEOR_EVENT:
 			meteor_path = random.choice(("Meteor1.png", "Meteor2.png", "Meteor3.png"))
 			random_x_pos = random.randrange(0,1280)
@@ -65,9 +94,21 @@ while True: #Game loop
 			meteor_group.add(meteor)
 
 	screen.fill((42,45,51))
+
+	laser_group.draw(screen)
 	spcaceship_group.draw(screen)
 	meteor_group.draw(screen)
+
+	laser_group.update()
 	meteor_group.update()
 	spcaceship_group.update()
+
+	#Collision
+	if pygame.sprite.spritecollide(spcaceship_group.sprite,meteor_group,True):
+		spcaceship_group.sprite.get_damage(1)
+
+	for laser in laser_group:
+		pygame.sprite.spritecollide(laser,meteor_group,True)
+	
 	pygame.display.update() #Draw frame
 	clock.tick(120) #COntrol the framerate
