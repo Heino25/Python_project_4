@@ -22,10 +22,10 @@ class SpaceShip(pygame.sprite.Sprite):
 			self.rect.right = 1280
 		if self.rect.left <= 0:
 			self.rect.left = 0
-		# if self.rect.top >= 360:
-		# 	self.rect.top = 360
-		# if self.rect.bottom <= 0:
-		# 	self.rect.bottom = 0
+		if self.rect.bottom >= 720:
+			self.rect.bottom = 720
+		if self.rect.top <= 0:
+			self.rect.top = 0
 
 
 	def display_health(self):
@@ -69,6 +69,11 @@ class Laser(pygame.sprite.Sprite):
 			self.kill()
 
 def main_game():
+
+	score_surface = game_font.render(f'{score}',True,(255,255,255))
+	score_rect = score_surface.get_rect(center = (1100,20))
+	screen.blit(score_surface,score_rect)
+
 	global laser_active
 	laser_group.draw(screen)
 	spaceship_group.draw(screen)
